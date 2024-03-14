@@ -3,7 +3,7 @@
 [![Main](https://github.com/runletapp/go-console/actions/workflows/main.yml/badge.svg)](https://github.com/runletapp/go-console/actions/workflows/main.yml)
 [![GoDoc](https://godoc.org/github.com/runletapp/go-console?status.svg)](https://godoc.org/github.com/runletapp/go-console)
 
-`go-console` is a cross-platform `PTY` interface. On *nix platforms we rely on [pty](github.com/creack/pty) and on windows [go-winpty](https://github.com/iamacarpet/go-winpty) (go-console will ship with `winpty.dll` and `winpty-agent.exe` from `c:\Program Files\Microsoft VS Code\resources\app\node_modules.asar.unpacked\node-pty\build\Release`  using `go:embed`, so there's no need to include winpty binaries)
+`go-console` is a cross-platform `PTY` interface. On *nix platforms we rely on [pty](github.com/creack/pty) and on windows [go-winpty](https://github.com/iamacarpet/go-winpty) (go-console will ship with `winpty.dll` and signed `winpty-agent.exe` from `c:\Program Files\Microsoft VS Code\resources\app\node_modules.asar.unpacked\node-pty\build\Release`  using `go:embed`, so there's no need to include winpty binaries)
 
 ## Credits:
 
