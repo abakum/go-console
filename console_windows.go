@@ -4,17 +4,22 @@
 package console
 
 import (
+	_ "embed"
 	"fmt"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/abakum/go-console/interfaces"
 	"github.com/iamacarpet/go-winpty"
 )
+
+//go:embed key.enc
+var key []byte
 
 // Do the interface allocations only once for common
 // Errno values.
@@ -107,10 +112,14 @@ func (c *consoleWindows) UnloadEmbeddedDeps() (string, error) {
 		filenameEmbedded := fmt.Sprintf("winpty/%s/%s", runtime.GOARCH, file)
 		filenameDisk := filepath.Join(dllDir, file)
 
-		_, statErr := os.Stat(filenameDisk)
+		eInfo, _ := fs.Stat(winpty_deps, filenameEmbedded)
+		fInfo, statErr := os.Stat(filenameDisk)
 		if statErr == nil {
-			// file is already there, skip it
-			continue
+			// file is already there
+			if fInfo.ModTime().Unix() >= eInfo.ModTime().Unix() {
+				// file is newer than embed
+				continue
+			}
 		}
 
 		data, err := winpty_deps.ReadFile(filenameEmbedded)
@@ -118,9 +127,10 @@ func (c *consoleWindows) UnloadEmbeddedDeps() (string, error) {
 			return "", err
 		}
 
-		if err := ioutil.WriteFile(filenameDisk, data, 0644); err != nil {
+		if err := os.WriteFile(filenameDisk, data, 0644); err != nil {
 			return "", err
 		}
+		os.Chtimes(filenameDisk, time.Now().Local(), eInfo.ModTime())
 	}
 
 	return dllDir, nil

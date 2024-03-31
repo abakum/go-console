@@ -15,6 +15,7 @@ func TestUnloadEmbeddedDeps(t *testing.T) {
 
 	dllPath, err := proc.UnloadEmbeddedDeps()
 	assert.Nil(t, err)
+	t.Log(dllPath)
 
 	files, err := os.ReadDir(dllPath)
 	assert.Nil(t, err)
