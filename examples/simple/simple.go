@@ -11,6 +11,7 @@ import (
 	"github.com/abakum/term"
 )
 
+// Using the `console` and raw mode of `os.Stdin` is the only way to call a shell in a loop for Windows.
 func main() {
 	var args []string
 
@@ -19,7 +20,7 @@ func main() {
 
 	var ioe *term.IOE
 
-	for i := 0; i < 6; i++ {
+	for i := 0; i < 8; i++ {
 		con, err := console.New(120, 60)
 		if err != nil {
 			panic(err)
@@ -29,9 +30,12 @@ func main() {
 		raw := i > 1
 		shell := i > 3
 		if runtime.GOOS == "windows" {
-			args = []string{"cmd.exe", "/c", "pause"}
+			args = []string{"cmd", "/c", "pause"}
 			if shell {
 				args = args[0:1]
+				if i > 5 {
+					args[0] = "powershell"
+				}
 			}
 		} else {
 			args = []string{"read", "-n1", "-rsp", "Press any key to continue . . ."}
@@ -40,8 +44,8 @@ func main() {
 			}
 		}
 
-		// case (cmd && raw && shell) is true then hang
-		if i%2 == 1 && shell {
+		// case (cmd && raw && shell && shell=="cmd") is true then hang
+		if i%2 == 1 && shell && args[0] == "cmd" {
 			raw = false
 		}
 		m := "Press `Enter` then `Enter`"
@@ -51,12 +55,12 @@ func main() {
 		case shell:
 			m = "Type `exit` then press `Enter`"
 		case raw:
-			m = "Press `Esc`"
+			m = "Press `Enter`"
 		}
 		fmt.Print(m, " raw ", raw, " shell ", shell)
 		switch i % 2 {
 		case 0:
-			fmt.Println(" con")
+			fmt.Println(" con", args[0])
 			if raw {
 				ioe = term.NewIOE()
 			}
@@ -88,7 +92,7 @@ func main() {
 			fmt.Println("Stdin done")
 
 		case 1:
-			fmt.Println(" cmd")
+			fmt.Println("", args[0])
 			if raw {
 				ioe = term.NewIOE()
 			}
