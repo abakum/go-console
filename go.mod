@@ -5,7 +5,7 @@ go 1.21.4
 require (
 	github.com/abakum/embed-encrypt v0.0.0-20240330115809-059354cfa29a
 	github.com/abakum/term v0.0.0-20240212164236-135562d7e4cf
-	github.com/creack/pty v1.1.18
+	github.com/creack/pty v1.1.21
 	github.com/iamacarpet/go-winpty v1.0.4
 	github.com/stretchr/testify v1.7.0
 )
