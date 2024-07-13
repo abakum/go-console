@@ -1,6 +1,6 @@
 module github.com/abakum/go-console
 
-go 1.21.4
+go 1.21
 
 require (
 	github.com/abakum/embed-encrypt v0.0.0-20240330115809-059354cfa29a
