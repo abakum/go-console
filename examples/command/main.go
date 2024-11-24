@@ -9,7 +9,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/abakum/cancelreader"
 	"github.com/abakum/go-console"
 	cc "github.com/containerd/console"
 	"github.com/mattn/go-isatty"
@@ -44,16 +43,37 @@ func main() {
 	}
 	log.SetFlags(log.Lmicroseconds | log.Lshortfile)
 	log.SetPrefix("\r")
-	for i := 4; i < 8; i++ {
+
+	var (
+		// cr  cancelreader.CancelReader
+		err error
+		// ar  io.ReadCloser
+		s *Stdin
+	)
+	for i := 0; i < 8; i++ {
 		reset = setRaw(&raw, reset)
 		if i%4 > 1 {
 			reset(&raw)
 			cmd = exec.Command(arg0)
+			// cr, err = cancelreader.NewReader(os.Stdin)
+			// if err != nil {
+			// 	panic(err)
+			// }
 		} else {
 			reset = setRaw(&raw, reset)
 			cmd = exec.Command(arg0, arg1, arg2)
+			// ar, err = windowsconsole.NewAnsiReaderDuplicate(os.Stdin)
+			// if err != nil {
+			// 	panic(err)
+			// }
 		}
 		log.Println(cmd)
+		s, err = NewStdin()
+		// ar, err = windowsconsole.NewAnsiReaderDuplicate(os.Stdin)
+		if err != nil {
+			panic(err)
+		}
+
 		if i < 4 {
 			// <Esc> <Esc> exit<Enter> exit<Enter>
 			log.Println("--without PTY", i)
@@ -82,23 +102,30 @@ func main() {
 				panic(err)
 			}
 
-			cr, err := cancelreader.NewReader(os.Stdin)
-			if err != nil {
-				panic(err)
-			}
 			go func() {
 				_, err = io.Copy(os.Stdout, con)
 				log.Println("Stdout done", i, err)
-				log.Println("Cancel read stdin", i, cr.Cancel())
-			}()
-			_, err = io.Copy(con, cr)
-			log.Println("Stdin done", i, err)
+				log.Println("Cancel read stdin", i, s.Cancel())
+				// if raw {
+				// 	log.Println("Cancel read stdin", i, ar.Close())
+				// } else {
+				// 	// log.Println("Cancel read stdin", i, cr.Cancel())
+				// 	log.Println("Cancel read stdin", i, ar.Close())
+				// }
 
+			}()
+			_, err = io.Copy(con, s)
+			// if raw {
+			// 	_, err = io.Copy(con, ar)
+			// } else {
+			// 	// _, err = io.Copy(con, cr)
+			// 	_, err = io.Copy(con, ar)
+			// }
+			log.Println("Stdin done", i, err)
 			log.Println(con.Wait())
-			log.Println("cr.Close", cr.Close())
+			log.Println("s.Close", s.Close())
 			log.Println("con.Close", con.Close())
 		}
-		// reset(&raw)
 	}
 }
 
