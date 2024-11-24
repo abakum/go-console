@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 
-	windowsconsole "github.com/abakum/term/windows"
+	term "github.com/abakum/term/windows"
 	"github.com/xlab/closer"
 	"golang.org/x/sys/windows"
 )
@@ -52,7 +52,7 @@ type Stdin struct {
 }
 
 func NewStdin() (*Stdin, error) {
-	rc, err := windowsconsole.NewAnsiReaderDuplicate(os.Stdin)
+	rc, err := term.NewAnsiReaderDuplicate(os.Stdin)
 	return &Stdin{
 		ReadCloser: rc,
 	}, err

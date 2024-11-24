@@ -45,31 +45,20 @@ func main() {
 	log.SetPrefix("\r")
 
 	var (
-		// cr  cancelreader.CancelReader
 		err error
-		// ar  io.ReadCloser
-		s *Stdin
+		s   *Stdin
 	)
 	for i := 0; i < 8; i++ {
 		reset = setRaw(&raw, reset)
 		if i%4 > 1 {
 			reset(&raw)
 			cmd = exec.Command(arg0)
-			// cr, err = cancelreader.NewReader(os.Stdin)
-			// if err != nil {
-			// 	panic(err)
-			// }
 		} else {
 			reset = setRaw(&raw, reset)
 			cmd = exec.Command(arg0, arg1, arg2)
-			// ar, err = windowsconsole.NewAnsiReaderDuplicate(os.Stdin)
-			// if err != nil {
-			// 	panic(err)
-			// }
 		}
 		log.Println(cmd)
 		s, err = NewStdin()
-		// ar, err = windowsconsole.NewAnsiReaderDuplicate(os.Stdin)
 		if err != nil {
 			panic(err)
 		}
@@ -106,21 +95,8 @@ func main() {
 				_, err = io.Copy(os.Stdout, con)
 				log.Println("Stdout done", i, err)
 				log.Println("Cancel read stdin", i, s.Cancel())
-				// if raw {
-				// 	log.Println("Cancel read stdin", i, ar.Close())
-				// } else {
-				// 	// log.Println("Cancel read stdin", i, cr.Cancel())
-				// 	log.Println("Cancel read stdin", i, ar.Close())
-				// }
-
 			}()
 			_, err = io.Copy(con, s)
-			// if raw {
-			// 	_, err = io.Copy(con, ar)
-			// } else {
-			// 	// _, err = io.Copy(con, cr)
-			// 	_, err = io.Copy(con, ar)
-			// }
 			log.Println("Stdin done", i, err)
 			log.Println(con.Wait())
 			log.Println("s.Close", s.Close())
